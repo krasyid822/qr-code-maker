@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Generate PWA Icons</title>
+</head>
+<body>
+  <canvas id="canvas192" width="192" height="192"></canvas>
+  <canvas id="canvas512" width="512" height="512"></canvas>
+  <script>
+    function generateIcon(canvasId, size) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      
+      // Gradient background (Fluent blue)
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#0078d4');
+      gradient.addColorStop(1, '#106ebe');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, size, size);
+      
+      // White QR-like pattern
+      ctx.fillStyle = 'white';
+      const blockSize = size / 8;
+      
+      // Top-left corner
+      ctx.fillRect(blockSize, blockSize, blockSize * 2, blockSize * 2);
+      ctx.fillStyle = '#0078d4';
+      ctx.fillRect(blockSize * 1.5, blockSize * 1.5, blockSize, blockSize);
+      
+      // Top-right corner
+      ctx.fillStyle = 'white';
+      ctx.fillRect(blockSize * 5, blockSize, blockSize * 2, blockSize * 2);
+      ctx.fillStyle = '#0078d4';
+      ctx.fillRect(blockSize * 5.5, blockSize * 1.5, blockSize, blockSize);
+      
+      // Bottom-left corner
+      ctx.fillStyle = 'white';
+      ctx.fillRect(blockSize, blockSize * 5, blockSize * 2, blockSize * 2);
+      ctx.fillStyle = '#0078d4';
+      ctx.fillRect(blockSize * 1.5, blockSize * 5.5, blockSize, blockSize);
+      
+      // Center pattern
+      ctx.fillStyle = 'white';
+      ctx.fillRect(blockSize * 3.5, blockSize * 3.5, blockSize * 1, blockSize * 1);
+      
+      // Download
+      const link = document.createElement('a');
+      link.download = `icon-${size}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+    
+    generateIcon('canvas192', 192);
+    setTimeout(() => generateIcon('canvas512', 512), 500);
+  </script>
+</body>
+</html>

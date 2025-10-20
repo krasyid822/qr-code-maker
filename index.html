@@ -3,7 +3,23 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content="Aplikasi pembuat kode QR dengan watermark kustom. Berfungsi offline, dapat diinstall sebagai aplikasi." />
+		<meta name="theme-color" content="#0078d4" />
+		<meta name="mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+		<meta name="apple-mobile-web-app-title" content="QR Maker" />
+		
 		<title>Alat Konversi Teks ke QR</title>
+		
+		<!-- PWA Manifest -->
+		<link rel="manifest" href="./manifest.json" />
+		
+		<!-- Icons -->
+		<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png" />
+		<link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png" />
+		<link rel="apple-touch-icon" href="./icon-192.png" />
+		
 		<style>
 			/* Fluent Design System Variables */
 			:root {
@@ -298,8 +314,8 @@
 				}
 			}
 		</style>
-		<!-- QRious CDN -->
-		<script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+		<!-- QRious Library (Local) -->
+		<script src="./qrious.min.js"></script>
 	</head>
 	<body>
 		<div class="container">
@@ -587,9 +603,60 @@
 			downloadBtn.addEventListener('click', downloadPNG);
 			resetBtn.addEventListener('click', resetAll);
 
-			// initial state
-			resetAll();
-		</script>
-	</body>
-</html>
+		// initial state
+		resetAll();
 
+		// PWA Service Worker Registration
+		if ('serviceWorker' in navigator) {
+			window.addEventListener('load', () => {
+				navigator.serviceWorker.register('./service-worker.js')
+					.then((registration) => {
+						console.log('✅ Service Worker registered successfully:', registration.scope);
+						
+						// Check for updates
+						registration.addEventListener('updatefound', () => {
+							const newWorker = registration.installing;
+							newWorker.addEventListener('statechange', () => {
+								if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+									// New update available
+									if (confirm('Update tersedia! Reload untuk menggunakan versi terbaru?')) {
+										newWorker.postMessage({ type: 'SKIP_WAITING' });
+										window.location.reload();
+									}
+								}
+							});
+						});
+					})
+					.catch((error) => {
+						console.error('❌ Service Worker registration failed:', error);
+					});
+			});
+
+			// Handle controller change (new SW activated)
+			navigator.serviceWorker.addEventListener('controllerchange', () => {
+				window.location.reload();
+			});
+		}
+
+		// PWA Install Prompt
+		let deferredPrompt;
+		window.addEventListener('beforeinstallprompt', (e) => {
+			// Prevent the mini-infobar from appearing on mobile
+			e.preventDefault();
+			deferredPrompt = e;
+			
+			// Show custom install button (optional - could add to UI)
+			console.log('💡 PWA can be installed');
+			
+			// You could show a custom install button here
+			// For now, we'll just log it
+		});
+
+		// Track if app was successfully installed
+		window.addEventListener('appinstalled', () => {
+			console.log('✅ PWA was installed successfully');
+			deferredPrompt = null;
+		});
+	</script>
+</body>
+</html>
