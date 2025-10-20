@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="id">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Alat Konversi Teks ke QR</title>
+		<style>
+			/* Fluent Design System Variables */
+			:root {
+				--fluent-bg: #f3f3f3;
+				--fluent-surface: rgba(243, 243, 243, 0.7);
+				--fluent-card: rgba(255, 255, 255, 0.7);
+				--fluent-accent: #0078d4;
+				--fluent-accent-hover: #106ebe;
+				--fluent-accent-press: #005a9e;
+				--fluent-text: #201f1e;
+				--fluent-text-secondary: #605e5c;
+				--fluent-border: rgba(0, 0, 0, 0.0578);
+				--fluent-shadow: 0 3.2px 7.2px 0 rgba(0,0,0,.132), 0 0.6px 1.8px 0 rgba(0,0,0,.108);
+				--fluent-shadow-hover: 0 6.4px 14.4px 0 rgba(0,0,0,.132), 0 1.2px 3.6px 0 rgba(0,0,0,.108);
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			body {
+				font-family: 'Segoe UI Variable', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+				padding: 32px 24px;
+				background: var(--fluent-bg);
+				color: var(--fluent-text);
+				margin: 0;
+				min-height: 100vh;
+			}
+
+			.container {
+				max-width: 900px;
+				margin: 0 auto;
+				background: var(--fluent-card);
+				backdrop-filter: blur(40px);
+				-webkit-backdrop-filter: blur(40px);
+				padding: 32px;
+				border-radius: 8px;
+				border: 1px solid var(--fluent-border);
+				box-shadow: var(--fluent-shadow);
+				transition: box-shadow 0.2s ease;
+			}
+
+			.container:hover {
+				box-shadow: var(--fluent-shadow-hover);
+			}
+
+			h1 {
+				font-size: 28px;
+				font-weight: 600;
+				margin: 0 0 8px 0;
+				color: var(--fluent-text);
+			}
+
+			.meta {
+				font-size: 14px;
+				color: var(--fluent-text-secondary);
+				margin-bottom: 24px;
+				line-height: 1.5;
+			}
+
+			label {
+				font-size: 14px;
+				font-weight: 600;
+				color: var(--fluent-text);
+				display: block;
+				margin-bottom: 8px;
+			}
+
+			textarea {
+				width: 100%;
+				height: 120px;
+				padding: 11px;
+				font-size: 14px;
+				font-family: 'Segoe UI Variable', 'Segoe UI', sans-serif;
+				border: 1px solid var(--fluent-border);
+				border-radius: 4px;
+				resize: vertical;
+				background: rgba(255, 255, 255, 0.7);
+				color: var(--fluent-text);
+				transition: border-color 0.1s ease, background 0.1s ease;
+			}
+
+			textarea:hover {
+				background: rgba(255, 255, 255, 0.9);
+				border-color: rgba(0, 0, 0, 0.15);
+			}
+
+			textarea:focus {
+				outline: none;
+				border-color: var(--fluent-accent);
+				background: rgba(255, 255, 255, 1);
+			}
+
+			input[type="number"],
+			input[type="text"],
+			select {
+				padding: 8px 11px;
+				font-size: 14px;
+				font-family: 'Segoe UI Variable', 'Segoe UI', sans-serif;
+				border: 1px solid var(--fluent-border);
+				border-radius: 4px;
+				background: rgba(255, 255, 255, 0.7);
+				color: var(--fluent-text);
+				transition: border-color 0.1s ease, background 0.1s ease;
+			}
+
+			input:hover,
+			select:hover {
+				background: rgba(255, 255, 255, 0.9);
+				border-color: rgba(0, 0, 0, 0.15);
+			}
+
+			input:focus,
+			select:focus {
+				outline: none;
+				border-color: var(--fluent-accent);
+				background: rgba(255, 255, 255, 1);
+			}
+
+			.controls {
+				display: flex;
+				gap: 12px;
+				align-items: center;
+				margin-top: 16px;
+				flex-wrap: wrap;
+			}
+
+			.row {
+				display: flex;
+				gap: 8px;
+				align-items: center;
+			}
+
+			.spacer {
+				flex: 1;
+			}
+
+			button {
+				padding: 8px 20px;
+				font-size: 14px;
+				font-weight: 600;
+				font-family: 'Segoe UI Variable', 'Segoe UI', sans-serif;
+				border-radius: 4px;
+				border: 1px solid var(--fluent-border);
+				background: rgba(255, 255, 255, 0.7);
+				color: var(--fluent-text);
+				cursor: pointer;
+				transition: all 0.1s ease;
+				backdrop-filter: blur(20px);
+			}
+
+			button:hover {
+				background: rgba(249, 249, 249, 0.9);
+				border-color: rgba(0, 0, 0, 0.15);
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+			}
+
+			button:active {
+				transform: scale(0.98);
+			}
+
+			button.primary {
+				background: var(--fluent-accent);
+				color: white;
+				border-color: var(--fluent-accent);
+			}
+
+			button.primary:hover {
+				background: var(--fluent-accent-hover);
+				border-color: var(--fluent-accent-hover);
+			}
+
+			button.primary:active {
+				background: var(--fluent-accent-press);
+			}
+
+			button:disabled {
+				opacity: 0.4;
+				cursor: not-allowed;
+				transform: none;
+			}
+
+			button:disabled:hover {
+				background: rgba(255, 255, 255, 0.7);
+				box-shadow: none;
+			}
+
+			button.primary:disabled:hover {
+				background: var(--fluent-accent);
+			}
+
+			.watermark-section {
+				margin-top: 20px;
+				padding: 20px;
+				background: rgba(249, 249, 249, 0.5);
+				backdrop-filter: blur(20px);
+				border: 1px solid var(--fluent-border);
+				border-radius: 6px;
+			}
+
+			.watermark-section > label:first-child {
+				font-size: 15px;
+				font-weight: 600;
+				display: block;
+				margin-bottom: 12px;
+			}
+
+			.watermark-controls {
+				display: flex;
+				gap: 12px;
+				align-items: center;
+				flex-wrap: wrap;
+			}
+
+			.preview {
+				display: grid;
+				grid-template-columns: auto 1fr;
+				gap: 24px;
+				margin-top: 24px;
+				padding: 20px;
+				background: rgba(249, 249, 249, 0.5);
+				backdrop-filter: blur(20px);
+				border: 1px solid var(--fluent-border);
+				border-radius: 6px;
+			}
+
+			.preview-canvas-container {
+				display: flex;
+				flex-direction: column;
+				gap: 12px;
+			}
+
+			.preview canvas {
+				background: white;
+				border: 1px solid var(--fluent-border);
+				border-radius: 4px;
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+			}
+
+			.preview-data {
+				display: flex;
+				flex-direction: column;
+				min-width: 0;
+			}
+
+			pre {
+				font-size: 12px;
+				font-family: 'Cascadia Code', 'Consolas', monospace;
+				max-width: 100%;
+				overflow: auto;
+				background: rgba(255, 255, 255, 0.7);
+				padding: 12px;
+				border-radius: 4px;
+				border: 1px solid var(--fluent-border);
+				height: 140px;
+				white-space: nowrap;
+				color: var(--fluent-text-secondary);
+				margin: 8px 0 0 0;
+			}
+
+			footer {
+				margin-top: 24px;
+				padding-top: 20px;
+				border-top: 1px solid var(--fluent-border);
+				font-size: 13px;
+				color: var(--fluent-text-secondary);
+				line-height: 1.6;
+			}
+
+			footer strong {
+				color: var(--fluent-text);
+			}
+
+			/* Responsive */
+			@media (max-width: 768px) {
+				.preview {
+					grid-template-columns: 1fr;
+				}
+
+				.controls {
+					flex-direction: column;
+					align-items: stretch;
+				}
+
+				.row {
+					flex-direction: column;
+					align-items: stretch;
+				}
+
+				button {
+					width: 100%;
+				}
+			}
+		</style>
+		<!-- QRious CDN -->
+		<script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+	</head>
+	<body>
+		<div class="container">
+			<h1>Alat Konversi Teks → QR</h1>
+			<p class="meta">Masukkan teks di bawah, atur ukuran (pixel), lalu tekan <strong>Generate</strong>. Hasil dapat diunduh sebagai gambar PNG.</p>
+
+			<label for="text">Teks / URL</label>
+			<textarea id="text" placeholder="Ketik teks atau URL di sini..."></textarea>
+
+		<div class="controls">
+			<div class="row">
+				<label for="size">Ukuran (px):</label>
+				<input id="size" type="number" min="64" max="1024" value="300" style="width:100px" />
+			</div>
+
+			<button id="generate" class="primary">Generate</button>
+			<button id="download" disabled>Download PNG</button>
+			<button id="reset">Reset</button>
+			<div class="spacer"></div>
+		</div>
+
+		<div class="watermark-section">
+			<label>Watermark Kustom (opsional)</label>
+			<div class="watermark-controls">
+				<div>
+					<label for="watermark" style="font-size:13px;margin-bottom:4px">Teks:</label>
+					<input id="watermark" type="text" placeholder="© Your Name" style="width:200px" />
+				</div>
+				</div>
+				<div>
+					<label for="watermark-type" style="font-size:13px;margin-bottom:4px">Tipe:</label>
+					<select id="watermark-type">
+						<option value="overlay">Overlay (menimpa)</option>
+						<option value="embed">Embed (ruang sendiri)</option>
+					</select>
+				</div>
+				<div>
+					<label for="watermark-position" style="font-size:13px;margin-bottom:4px">Posisi:</label>
+					<select id="watermark-position">
+						<option value="bottom-right">Kanan bawah</option>
+						<option value="bottom-left">Kiri bawah</option>
+						<option value="top-right">Kanan atas</option>
+						<option value="top-left">Kiri atas</option>
+						<option value="center">Tengah</option>
+					</select>
+				</div>
+				<div>
+					<label for="watermark-size" style="font-size:13px;margin-bottom:4px">Ukuran:</label>
+					<input id="watermark-size" type="number" min="8" max="72" value="16" style="width:70px" />
+				</div>
+				</div>
+			</div>
+
+		<div class="preview">
+			<div class="preview-canvas-container">
+				<label>Preview</label>
+				<canvas id="qr-canvas" width="300" height="300"></canvas>
+			</div>
+			<div class="preview-data">
+				<label>Data URL</label>
+				<pre id="data-url">(belum dibuat)</pre>
+			</div>
+		</div>
+
+		<footer>
+			<strong>Catatan:</strong> Jika teks kosong, tombol Generate/Download akan dinonaktifkan. Watermark bersifat opsional (biarkan kosong jika tidak diperlukan). Tipe "Overlay" menimpa QR, sedangkan "Embed" membuat box dengan background putih.
+		</footer>
+	</div>
+
+		<script>
+		// Elemen
+		const textEl = document.getElementById('text');
+		const sizeEl = document.getElementById('size');
+		const generateBtn = document.getElementById('generate');
+		const downloadBtn = document.getElementById('download');
+		const resetBtn = document.getElementById('reset');
+		const canvas = document.getElementById('qr-canvas');
+		const dataUrlPre = document.getElementById('data-url');
+		const watermarkEl = document.getElementById('watermark');
+		const watermarkPositionEl = document.getElementById('watermark-position');
+		const watermarkSizeEl = document.getElementById('watermark-size');
+		const watermarkTypeEl = document.getElementById('watermark-type');			// Inisialisasi QRious ke canvas
+			const qr = new QRious({
+				element: canvas,
+				value: '',
+				size: parseInt(sizeEl.value, 10) || 300,
+				level: 'H',
+				background: 'white',
+			});
+
+		// flag untuk menandai apakah QR sudah digenerate
+		let generated = false;
+
+		function drawWatermark() {
+			const watermarkText = watermarkEl.value.trim();
+			if (!watermarkText) return; // tidak ada watermark, skip
+
+			const ctx = canvas.getContext('2d');
+			const fontSize = Math.max(8, Math.min(72, parseInt(watermarkSizeEl.value, 10) || 16));
+			const position = watermarkPositionEl.value;
+			const type = watermarkTypeEl.value;
+
+			ctx.font = `bold ${fontSize}px sans-serif`;
+			ctx.textBaseline = 'top';
+
+			const metrics = ctx.measureText(watermarkText);
+			const textWidth = metrics.width;
+			const textHeight = fontSize * 1.2; // approximate height
+			const padding = 8;
+
+			let x, y;
+
+			if (type === 'embed') {
+				// Embed mode: gambar background putih dengan border untuk watermark
+				ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+				ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+				ctx.lineWidth = 1;
+
+				let rectX, rectY, rectWidth, rectHeight;
+				rectWidth = textWidth + padding * 2;
+				rectHeight = textHeight + padding * 2;
+
+				switch (position) {
+					case 'top-left':
+						rectX = padding;
+						rectY = padding;
+						x = rectX + padding;
+						y = rectY + padding;
+						ctx.textAlign = 'left';
+						break;
+					case 'top-right':
+						rectX = canvas.width - rectWidth - padding;
+						rectY = padding;
+						x = rectX + padding;
+						y = rectY + padding;
+						ctx.textAlign = 'left';
+						break;
+					case 'bottom-left':
+						rectX = padding;
+						rectY = canvas.height - rectHeight - padding;
+						x = rectX + padding;
+						y = rectY + padding;
+						ctx.textAlign = 'left';
+						break;
+					case 'bottom-right':
+						rectX = canvas.width - rectWidth - padding;
+						rectY = canvas.height - rectHeight - padding;
+						x = rectX + padding;
+						y = rectY + padding;
+						ctx.textAlign = 'left';
+						break;
+					case 'center':
+						rectX = (canvas.width - rectWidth) / 2;
+						rectY = (canvas.height - rectHeight) / 2;
+						x = rectX + padding;
+						y = rectY + padding;
+						ctx.textAlign = 'left';
+						break;
+					default:
+						rectX = canvas.width - rectWidth - padding;
+						rectY = canvas.height - rectHeight - padding;
+						x = rectX + padding;
+						y = rectY + padding;
+						ctx.textAlign = 'left';
+				}
+
+				// Gambar box background
+				ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
+				ctx.strokeRect(rectX, rectY, rectWidth, rectHeight);
+
+				// Gambar text dengan warna solid (tidak transparan)
+				ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+				ctx.fillText(watermarkText, x, y);
+
+			} else {
+				// Overlay mode: gambar text semi-transparan langsung di atas QR
+				ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+
+				switch (position) {
+					case 'top-left':
+						x = padding;
+						y = padding;
+						ctx.textAlign = 'left';
+						break;
+					case 'top-right':
+						x = canvas.width - padding;
+						y = padding;
+						ctx.textAlign = 'right';
+						break;
+					case 'bottom-left':
+						x = padding;
+						y = canvas.height - textHeight - padding;
+						ctx.textAlign = 'left';
+						break;
+					case 'bottom-right':
+						x = canvas.width - padding;
+						y = canvas.height - textHeight - padding;
+						ctx.textAlign = 'right';
+						break;
+					case 'center':
+						x = canvas.width / 2;
+						y = canvas.height / 2 - textHeight / 2;
+						ctx.textAlign = 'center';
+						break;
+					default:
+						x = canvas.width - padding;
+						y = canvas.height - textHeight - padding;
+						ctx.textAlign = 'right';
+				}
+
+				ctx.fillText(watermarkText, x, y);
+			}
+		}			function updateButtons() {
+				const hasText = textEl.value.trim().length > 0;
+				generateBtn.disabled = !hasText;
+				// download hanya aktif bila sudah pernah digenerate
+				downloadBtn.disabled = !generated;
+			}
+
+		function generateQR() {
+			const txt = textEl.value.trim();
+			if (!txt) return;
+			const size = Math.max(64, Math.min(1024, parseInt(sizeEl.value, 10) || 300));
+
+			// Update QRious size dan value SEBELUM mengubah canvas dimensions
+			// Ini penting karena QRious akan menggambar ketika value di-set
+			qr.size = size;
+			qr.value = txt;
+
+			// Setelah QRious menggambar, set dimensi canvas untuk memastikan ukuran benar
+			// TAPI ini akan menghapus canvas, jadi kita perlu trigger redraw dengan mengubah value sedikit
+			if (canvas.width !== size || canvas.height !== size) {
+				canvas.width = size;
+				canvas.height = size;
+				// Re-trigger QRious drawing karena canvas di-clear
+				qr.value = txt;
+			}
+
+			// Pastikan drawing selesai sebelum menambah watermark
+			requestAnimationFrame(() => requestAnimationFrame(() => {
+				// Gambar watermark DI ATAS QR code yang sudah ada
+				drawWatermark();
+
+				const dataUrl = canvas.toDataURL('image/png');
+				dataUrlPre.textContent = dataUrl;
+				generated = true;
+				updateButtons();
+			}));
+		}			function downloadPNG() {
+				const dataUrl = canvas.toDataURL('image/png');
+				const a = document.createElement('a');
+				a.href = dataUrl;
+				const safeName = (textEl.value.trim().slice(0,20) || 'qr')
+					.replace(/[^a-z0-9\-]/gi, '_');
+				const ts = new Date().toISOString().replace(/[:.]/g, '-');
+				a.download = `qr_${safeName}_${ts}.png`;
+				document.body.appendChild(a);
+				a.click();
+				a.remove();
+			}
+
+		function resetAll() {
+			textEl.value = '';
+			sizeEl.value = 300;
+			watermarkEl.value = '';
+			watermarkTypeEl.value = 'overlay';
+			watermarkPositionEl.value = 'bottom-right';
+			watermarkSizeEl.value = 16;
+			qr.value = '';
+			qr.size = 300;
+			canvas.width = 300;
+			canvas.height = 300;
+			const ctx = canvas.getContext('2d');
+			ctx.fillStyle = '#ffffff';
+			ctx.fillRect(0,0,canvas.width,canvas.height);
+			dataUrlPre.textContent = '(belum dibuat)';
+			generated = false;
+			updateButtons();
+		}			// Event listeners
+			textEl.addEventListener('input', updateButtons);
+			sizeEl.addEventListener('change', () => {
+				if (textEl.value.trim()) generateQR();
+			});
+			generateBtn.addEventListener('click', generateQR);
+			downloadBtn.addEventListener('click', downloadPNG);
+			resetBtn.addEventListener('click', resetAll);
+
+			// initial state
+			resetAll();
+		</script>
+	</body>
+</html>
+
